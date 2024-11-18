@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  key: 0x18fddb41c4f6316532162f1c54a0cf4c62562b499c392720f04e7d33e32e88fa
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    app: validator1
+  name: validator1-cm2

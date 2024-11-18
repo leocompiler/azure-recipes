@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validator1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validator1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: validator1
+    spec:
+      containers:
+        - args:
+            - --config-file=/opt/besu/common-config.toml
+            - --identity=validator1
+
+          image: hyperledger/besu:latest
+          name: validator1
+          ports:
+            - containerPort: 8545
+              protocol: TCP
+            - containerPort: 30303
+              protocol: TCP
+            - containerPort: 30303
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /opt/besu/common-config.toml
+              name: validator1-cm0
+              readOnly: true
+              subPath: common-config.toml
+            - mountPath: /opt/besu/genesis.json
+              name: validator1-cm1
+              readOnly: true
+              subPath: genesis.json
+            - mountPath: /opt/besu/key
+              name: validator1-cm2
+              readOnly: false
+              subPath: key
+            - mountPath: /opt/besu/data
+              name: validator1-data
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: common-config.toml
+                path: common-config.toml
+            name: validator1-cm0
+          name: validator1-cm0
+        - configMap:
+            items:
+              - key: genesis.json
+                path: genesis.json
+            name: validator1-cm1
+          name: validator1-cm1
+        - configMap:
+            items:
+              - key: key
+                path: key
+            name: validator1-cm2
+          name: validator1-cm2
+        - name: validator1-data
+          persistentVolumeClaim:
+            claimName: validator1-data
